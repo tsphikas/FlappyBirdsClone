@@ -1,51 +1,36 @@
-import Phaser from "phaser";
+import Phaser from 'phaser';
+import PlayScene from './scenes/PlayScene';
+import MenuScene from './scenes/MenuScene';
+import PreloadScene from './scenes/PreloadScene';
+import ScoreScene from './scenes/ScoreScene';
+import PauseScene from './scenes/PauseScene';
 
-const gameState = [];
+const WIDTH = 800;
+const HEIGHT = 600;
+const BIRD_POSITION = { x: WIDTH / 10, y: HEIGHT / 2 };
 
-const config = {
-  type: Phaser.AUTO,
-  width: 800,
-  height: 600,
-  physics: {
-    default: "arcade",
-    arcade: {
-      //gravity:{y:200}
-    },
-  },
-  scene: {
-    preload,
-    create,
-    update,
-  },
+const SHARED_CONFIG = {
+    width: WIDTH,
+    height: HEIGHT,
+    startPosition: BIRD_POSITION
 };
 
-function preload() {
-  this.load.image("sky", "assets/sky.png");
-  this.load.image("bird", "assets/bird.png");
-}
+const Scenes = [PreloadScene, MenuScene, ScoreScene, PlayScene, PauseScene];
+const createScene = Scene => new Scene(SHARED_CONFIG);
+const initScenes = () => Scenes.map(createScene);
 
-gameState.totalDelta = null;
-gameState.velocity = 200;
+const config = {
+    type: Phaser.AUTO,
+    ...SHARED_CONFIG,
+    pixelArt: true,
+    physics: {
+        default: 'arcade',
+        arcade: {
+            //gravity: { y: 300 },
+            //debug: true
+        }
+    },
+    scene: initScenes()
+};
 
-function create() {
-  gameState.sky = this.add.image(0, 0, "sky");
-  gameState.sky.setOrigin(0, 0);
-
-  gameState.bird = this.physics.add.sprite(
-    config.width / 10,
-    config.height / 2,
-    "bird"
-  );
-  gameState.bird.setOrigin(0);
-
-  gameState.bird.body.velocity.x = gameState.velocity;
-}
-
-function update(time, delta) {
-  if (gameState.bird.x >= config.width - gameState.bird.width) {
-    gameState.bird.body.velocity.x = -200;
-  } else if (gameState.bird.x <= 0) {
-    gameState.bird.body.velocity.x = gameState.velocity;
-  }
-}
 new Phaser.Game(config);
